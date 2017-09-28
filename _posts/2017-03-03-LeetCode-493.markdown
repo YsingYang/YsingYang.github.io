@@ -1,0 +1,152 @@
+---
+layout: post
+title:  "LeetCode 493.Reverse Pairs"
+categories: jekyll update
+---
+
+## Description
+Given an array nums, we call (i, j) an **important** reverse pair if<font color = 'red'> i &lt; j </font> and <font color = 'red'> inums[i] &gt; 2*nums[j] </font> .You need to return the number of important reverse pairs in the given array.
+
+
+#### Example1:
+
+> **Input**:[1,3,2,3,1]
+  **OutPut**:2
+  
+
+#### Example2:
+> **Input**：[2,4,3,5,1]
+  **Output**:3
+  
+#### Note:
+1. The length of the given array will not exceed 50,000.
+2. All the numbers in the input array are in the range of 32-bit integer.
+
+## Algorithm 1 Binary Search Tree
+### 描述
+由于穷举的话，是O(n^2)的时间复杂度，那么如何将他复杂度降低，可以利用二分查找树的特性，从后往前插入数组，同时在插入的过程中加入count,统计比该值小的点，那么，我们只需要找在之前已有的节点中，找到是否存在 nums[i] > 2*nums[j]的节点，同时，由于排序二叉树的特性，如果当前的值不满足，转向比较该节点左节点的值，如果满足，加上该节点的count,转向右节点继续搜索。
+
+1.逆序搜索并插入节点到BST中
+2.搜索操作：
+  1. 如果val/2.0(后面直接统称为val)>root->val,则满足条件，count += root->count(root->count记录了比该节点小的所有节点个数)。同时递归右子树寻找合适的节点
+  2. else ,则当前节点不满足，则向左子树中寻找满足的个数
+
+3.插入操作：
+  1. 如果val == root->val ,直接root->count++;
+  2. 如果val > root->val,则递归进入右子树寻找插入节点位置
+  3. else,root->count++,递归进入左子树寻找插入位置
+
+
+### 具体算法实现如下
+```
+class Solution {
+struct TreeNode{
+    int val,count;            //节点的两个成员变量，一个为val值，一个为计数器，计数器用于统计比该值小的点有多少个。
+    TreeNode *left,*right;
+    TreeNode(int v):val(v),count(1),left(nullptr),right(nullptr){}
+};
+public:
+    int reversePairs(vector<int>& nums) {
+        int size = nums.size(),res = 0;
+        if(nums.size()<=1)
+            return res;               //如果size<=1,则为0
+        TreeNode* root = new TreeNode(nums[size-1]);
+        for(int i=size-2;i>=0;--i){     //从后往前向树搜索并插入节点。
+            res += CountSearch(root,nums[i]/2.0);    //           除以2.0是避免在×操作上会导致溢出。
+            insert(root,nums[i]);    //搜索完毕，插入该节点
+        }
+        return res;
+    }
+    
+    /*
+    	下为搜索算法。递归搜索count值
+    */
+    int CountSearch(TreeNode *root,float val){
+        if(!root) 
+            return 0;
+        if(root->val<val)
+            return root->count + CountSearch(root->right,val);
+              //如果当前root->val<val,那么该val满足特性，加上该节点的count,(该节点的count即为比该节点小的所有节点个数，提高搜索效率)，同时继续搜索右子树。
+        else  //如果不满足，搜索左子树中有无满足的值
+            return CountSearch(root->left,val);
+    }
+    
+    /*
+    	以下为插入节点的操作算法；
+    */
+    TreeNode* insert(TreeNode *root,int val){
+        if(!root){
+            root = new TreeNode(val);
+            return root;
+        }
+        if(root->val==val)
+            ++root->count;  //如果节点等于val,++count即可
+        else if(root->val>val){
+            ++root->count;  //如果节点值大于val,++count,同时继续向左子树找插入的位置
+            root->left =  insert(root->left,val);
+        }
+        else
+            root->right = insert(root->right,val);  //如果节点值小于val, 则直接往右子树找插入位置。
+        return root;
+            
+    }
+};
+
+```
+
+### 该算法缺点
+根据BST的特性，我们知道如果不是平衡的BST与正常的搜索并没有太大的区别，于是这个算法会getTLE在[1,2,3,4,5,6,7,8,9,。。。。。。。50000]上
+那么我们就需要另一种算法。
+
+## Algotithm2 merge Sort(divide and conquer)
+
+### 描述
+  这个问题又可以会到分治的策略上，首先对于每一个数组，可以单独分成多个子问题，对于每个长度为2的数组[x,y]如果x/2>y，则return 1,同时，就地排序，返回一个有序的子数组，那么递归返回后得到的是两个有序的子数组[x,y],[k,j],那么我们可以利用有序的特性，将这个问题简化，如果,x/2>j，那么y/2肯定也 >j,也就是我们在比较的同时，可以递增右子数组的指针，使得下一个左子数组的数，一定也满足上一个节点的个数
+
+步骤
+1.将问题递归分成多个自问，若子问题长度<=1,返回0，否则执行下列操作，f = Larray[0],r = Rarray[0]
+2.循环，出口为f!=Larray[size]
+
+   1. 当 f > r时，递增r,直到边界和遇到&lt;r
+   2. count += r-mid;
+   3. ++f;重复上述步骤知道循环结束
+
+
+3.implace_merge，执行归并排序，可以自己写一个归并，并没有什么太大的区别
+4.返回count给递归上层
+
+### 代码
+```
+class Solution {
+public:
+    int reversePairs(vector<int>& nums) {
+        return CountPair(nums.begin(),nums.end()); //传入迭代器进行操作，（因为要执行inplace_merge）需要传入迭代器。
+    }
+    
+    int CountPair(vector<int>::iterator begin,vector<int>::iterator end){
+        if(end-begin<=1){
+            return 0;
+        }
+        vector<int>::iterator mid = ((end - begin)>>1) + begin;//分割问题
+        int count = CountPair(begin,mid)+ CountPair(mid,end);//计算子问题得到的count;
+        vector<int>::iterator i,j;
+        for(i=begin,j=mid;i!=mid;++i){
+            while(j!=end&&(*i>2L*(*j))){
+                ++j;                          //计算*i > *j的j 最大下标
+            }
+            count += j-mid; //i中满足的个数
+        }
+        inplace_merge(begin,mid,end);//归并排序
+        return count;
+        
+    }
+};
+
+//该算法比BST在最坏情况得到更好得解决
+```
+
+## 总结
+   其实这一题还可以用binary indexed tree解决，只不过binary indexed tree不是最适合解决这种情况，所以打算在单独拿一道binary indexed tree 的题目来描述。
+   另外这道题其实与**315. Count of Smaller Numbers After Self**是一样类型的题，而且解答方法几乎一致，只不过没有[1..-50000]的特殊样例，不过这也提醒我们，对于每一种结构算法，我们都需要考虑他的最坏情况，在考虑适合解决什么的同时，也要考虑不适合解决什么问题。
+
+
