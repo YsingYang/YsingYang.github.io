@@ -1,7 +1,9 @@
 ---
 layout: post
 title:  "LeetCode 493.Reverse Pairs"
-categories: jekyll update
+excerpt: "LeetCode"
+tags: [post, LeetCode]
+comments: true
 ---
 
 ## Description

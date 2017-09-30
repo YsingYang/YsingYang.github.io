@@ -1,7 +1,9 @@
 ---
 layout: post
 title:  "Prove that stingy SAT is NP-complete"
-categories: jekyll update
+excerpt: "Prove NP-Complete"
+tags: [post, Algorithm]
+comments: true
 ---
 
 # Exercises 8.3

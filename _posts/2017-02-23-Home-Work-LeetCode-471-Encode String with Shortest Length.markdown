@@ -1,7 +1,9 @@
 ---
 layout: post
 title:  "471. Encode String with Shortest Length"
-categories: jekyll update
+excerpt: "A ton of text to test readability with image feature."
+tags: [post, LeetCode]
+comments: true
 ---
 
 ## Description

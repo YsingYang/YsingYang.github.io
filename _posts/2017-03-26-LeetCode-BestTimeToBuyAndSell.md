@@ -1,7 +1,9 @@
 ---
 layout: post
 title:  "LeetCode-BestTimeToBuyAndSell"
-categories: jekyll update
+excerpt: "LeetCode"
+tags: [post, LeetCode]
+comments: true
 ---
 
 **继续把上周那一系列的题目写完**

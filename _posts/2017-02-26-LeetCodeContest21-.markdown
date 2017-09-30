@@ -1,7 +1,9 @@
 ---
 layout: post
 title:  "LeetCode　Contest 21"
-categories: jekyll update
+excerpt: "LeetCode"
+tags: [post, LeetCode]
+comments: true
 ---
 
 

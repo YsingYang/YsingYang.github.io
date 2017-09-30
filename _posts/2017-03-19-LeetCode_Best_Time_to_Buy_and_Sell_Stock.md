@@ -1,7 +1,9 @@
 ---
 layout: post
 title:  "LeetCode_Best_Time_to_Buy_and_Sell_Stock"
-categories: jekyll update
+excerpt: "LeetCode"
+tags: [post, LeetCode]
+comments: true
 ---
 
 这是一道系列题，这次主要是先写１,２和Best Time to Buy and Sell Stock with Cooldown
