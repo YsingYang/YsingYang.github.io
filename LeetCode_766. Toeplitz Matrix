@@ -1,0 +1,36 @@
+/*************************************
+
+一遍for解决问题
+大致的初始顺序是
+
+x>x>x>x
+^
+x x x x
+^
+x x x x
+
+当row减少至1时， 再对col进行增长
+
+*************************************/
+class Solution {
+public:
+    bool isToeplitzMatrix(vector<vector<int>>& matrix) {
+        //no empty
+        int rs = matrix.size(), cs = matrix[0].size();
+        for(int counter = 0; counter < rs + cs - 1; ++counter) {
+            int rStart = max(rs-1-counter, 0);
+            int cStart = rStart == 0 ? counter-rs+1:0;
+            int i = rStart + 1, j = cStart + 1;
+            //cout<<i<<"  "<<j<<endl;
+            while(i < rs && j < cs) {
+                if(matrix[i][j] != matrix[i-1][j-1]){
+                    return false;
+                }
+                ++i;
+                ++j;
+            }
+            
+        }
+        return true;
+    }
+};
